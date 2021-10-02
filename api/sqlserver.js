@@ -38,8 +38,8 @@ connection.on("connect", function (err) {
     console.log("error connecting: ", err);
   } else {
     console.log("connected");
-    const response = executeSQL();
-    console.log("connected: ", response);
+    // const response = executeSQL();
+    // console.log("connected: ", response);
   }
 });
 
@@ -47,7 +47,9 @@ connection.connect();
 
 console.log("euuuuuuuuuuuu");
 
-const executeSQL = () => {
+exports.executeSQL = (req, res) => {
+  response = [];
+
   request = new Request(
     "SELECT * FROM [ExampleDB].dbo.EMPHASYS ORDER BY ExecutedOn ASC OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;",
     function (err, rowCount, rows) {
@@ -55,25 +57,25 @@ const executeSQL = () => {
         console.log(err);
       } else {
         // Next SQL statement.
+        console.log("sending res");
+        res.json(response);
       }
     }
   );
 
   connection.execSql(request);
-  var counter = 1;
-  response = {};
+  //var counter = 1;
+
   request.on("row", function (columns) {
-    response[counter] = {};
-    columns.forEach(function (column) {
-      console.log(column.value);
-      response[counter][column.metadata.colName] = column.value;
-    });
-    counter += 1;
+    response.push(columns);
+    // columns.forEach(function (column) {
+    //   console.log(column.value);
+    //   response[counter][column.metadata.colName] = column.value;
+    // });
+    // counter += 1;
   });
 
   console.log("endd");
-
-  return response;
 };
 
 exports.tryThis = () => {
@@ -82,6 +84,6 @@ exports.tryThis = () => {
   //   console.log(data);
   // });
   //connection.connect();
-  const response = executeSQL();
-  console.log("response: ", response);
+  // const response = executeSQL();
+  // console.log("response: ", response);
 };

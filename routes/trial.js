@@ -1,7 +1,7 @@
 const express = require("express");
-const { tryThis } = require("../api/sqlserver");
+const { tryThis, executeSQL } = require("../api/sqlserver");
 const router = express.Router();
 
-router.get("/abc", tryThis);
+router.get("/abc", executeSQL);
 
 module.exports = router;
