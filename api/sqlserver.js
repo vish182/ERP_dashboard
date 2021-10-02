@@ -64,15 +64,15 @@ exports.executeSQL = (req, res) => {
   );
 
   connection.execSql(request);
-  //var counter = 1;
+  let counter = 0;
 
   request.on("row", function (columns) {
-    response.push(columns);
-    // columns.forEach(function (column) {
-    //   console.log(column.value);
-    //   response[counter][column.metadata.colName] = column.value;
-    // });
-    // counter += 1;
+    response.push({});
+    columns.forEach(function (column) {
+      //console.log(column.value);
+      response[counter][column.metadata.colName] = column.value;
+    });
+    counter += 1;
   });
 
   console.log("endd");
