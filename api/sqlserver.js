@@ -48,10 +48,12 @@ connection.connect();
 console.log("euuuuuuuuuuuu");
 
 exports.executeSQL = (req, res) => {
+  let offset = req.offset ? req.offset : 0;
+
   response = [];
 
   request = new Request(
-    "SELECT * FROM [ExampleDB].dbo.EMPHASYS ORDER BY ExecutedOn ASC OFFSET 0 ROWS FETCH NEXT 10 ROWS ONLY;",
+    `SELECT * FROM [ExampleDB].dbo.EMPHASYS ORDER BY ExecutedOn ASC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -86,4 +88,42 @@ exports.tryThis = () => {
   //connection.connect();
   // const response = executeSQL();
   // console.log("response: ", response);
+};
+
+exports.getOffset = (req, res, next, offset) => {
+  req.offset = offset;
+  next();
+};
+
+exports.getExecutionTypeCount = (req, res) => {
+  let offset = req.offset ? req.offset : 0;
+
+  response = [];
+
+  request = new Request(
+    `SELECT ExecutionType, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS GROUP BY ExecutionType;`,
+    function (err, rowCount, rows) {
+      if (err) {
+        console.log(err);
+      } else {
+        // Next SQL statement.
+        console.log("sending res");
+        res.json(response);
+      }
+    }
+  );
+
+  connection.execSql(request);
+  let counter = 0;
+
+  request.on("row", function (columns) {
+    response.push({});
+    columns.forEach(function (column) {
+      //console.log(column.value);
+      response[counter][column.metadata.colName] = column.value;
+    });
+    counter += 1;
+  });
+
+  console.log("endd");
 };

@@ -11,6 +11,7 @@ app.use(
   })
 );
 app.use(bodyParser.json());
+app.use(cors());
 
 const port = 8000;
 console.log("target");
