@@ -53,7 +53,7 @@ exports.executeSQL = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT * FROM [ExampleDB].dbo.EMPHASYS ORDER BY ExecutedOn ASC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -80,18 +80,71 @@ exports.executeSQL = (req, res) => {
   console.log("endd");
 };
 
+exports.getTimeSeriesTotal = (req, res) => {
+  req.series = [];
+
+  // for(let i=0; i<10; i++){
+  //   getTimeSeries();
+  // }
+};
+
+exports.getTimeSeries = (req, res) => {
+  let utc = new Date().toJSON().slice(0, 10).replace(/-/g, "-");
+  let starttime = req.starttime;
+  let endtime = req.endtime;
+
+  console.log(starttime, " -- ", endtime);
+
+  response = 0;
+
+  request = new Request(
+    `SELECT COUNT(ExecutedOn) FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutedOn > '${starttime}' AND ExecutedOn < '${endtime}' AND ExecutionType = 'NotExecuted';`,
+    function (err, rowCount, rows) {
+      if (err) {
+        console.log(err);
+      } else {
+        // Next SQL statement.
+        console.log("time res: ", response);
+        res.json({ count: response });
+      }
+    }
+  );
+
+  connection.execSql(request);
+  let counter = 0;
+
+  request.on("row", function (columns) {
+    // response.push({});
+    columns.forEach(function (column) {
+      //console.log(column.value);
+      response = column.value;
+    });
+    counter += 1;
+  });
+
+  console.log("end");
+};
+
+//
+
 exports.tryThis = () => {
   console.log("done this");
-  // getAllrecords().then((data) => {
-  //   console.log(data);
-  // });
-  //connection.connect();
-  // const response = executeSQL();
-  // console.log("response: ", response);
+  // let response = getTimeSeries2();
+  // console.log("time: ", response);
 };
 
 exports.getOffset = (req, res, next, offset) => {
   req.offset = offset;
+  next();
+};
+
+exports.getStartTime = (req, res, next, starttime) => {
+  req.starttime = starttime;
+  next();
+};
+
+exports.getEndTime = (req, res, next, endtime) => {
+  req.endtime = endtime;
   next();
 };
 
@@ -101,7 +154,7 @@ exports.getExecutionTypeCount = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT ExecutionType, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS GROUP BY ExecutionType;`,
+    `SELECT ExecutionType, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 GROUP BY ExecutionType;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -127,3 +180,34 @@ exports.getExecutionTypeCount = (req, res) => {
 
   console.log("endd");
 };
+
+// const getTimeSeries2 = () => {
+//   response = [];
+
+//   request = new Request(
+//     `SELECT COUNT(ExecutedOn) FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutedOn > '2021-08-30' AND ExecutedOn < '2021-08-31' AND ExecutionType = 'NotExecuted';`,
+//     function (err, rowCount, rows) {
+//       if (err) {
+//         console.log(err);
+//       } else {
+//         // Next SQL statement.
+//         console.log("sending res");
+//         return response;
+//       }
+//     }
+//   );
+
+//   connection.execSql(request);
+//   let counter = 0;
+
+//   request.on("row", function (columns) {
+//     response.push({});
+//     columns.forEach(function (column) {
+//       //console.log(column.value);
+//       response[counter][column.metadata.colName] = column.value;
+//     });
+//     counter += 1;
+//   });
+
+//   console.log("endd");
+// };
