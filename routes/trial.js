@@ -7,12 +7,15 @@ const {
   getEndTime,
   getExecutionTypeCount,
   getTimeSeries,
+  getFilterdResults,
 } = require("../api/sqlserver");
 const router = express.Router();
 
 router.get("/trial", tryThis);
 
 router.get("/records/:offset", executeSQL);
+
+router.post("/filteredrecords/:offset", getFilterdResults);
 
 router.get("/execution_type", getExecutionTypeCount);
 

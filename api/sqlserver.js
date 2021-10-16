@@ -53,7 +53,41 @@ exports.executeSQL = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    function (err, rowCount, rows) {
+      if (err) {
+        console.log(err);
+      } else {
+        // Next SQL statement.
+        console.log("sending res");
+        res.json(response);
+      }
+    }
+  );
+
+  connection.execSql(request);
+  let counter = 0;
+
+  request.on("row", function (columns) {
+    response.push({});
+    columns.forEach(function (column) {
+      //console.log(column.value);
+      response[counter][column.metadata.colName] = column.value;
+    });
+    counter += 1;
+  });
+
+  console.log("endd");
+};
+
+exports.getFilterdResults = (req, res) => {
+  let offset = req.offset ? req.offset : 0;
+  let filter = req.body;
+  console.log("filter: ", filter);
+  response = [];
+
+  request = new Request(
+    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
