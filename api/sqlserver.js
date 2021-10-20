@@ -114,6 +114,40 @@ exports.getFilterdResults = (req, res) => {
   console.log("endd");
 };
 
+exports.getFilterdArchivedResults = (req, res) => {
+  let offset = req.offset ? req.offset : 0;
+  let filter = req.body;
+  console.log("filter: ", filter);
+  response = [];
+
+  request = new Request(
+    `SELECT * FROM [ExampleDB].dbo.ARCHIVES WHERE ExecutionType != 'Executed' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    function (err, rowCount, rows) {
+      if (err) {
+        console.log(err);
+      } else {
+        // Next SQL statement.
+        console.log("sending res");
+        res.json(response);
+      }
+    }
+  );
+
+  connection.execSql(request);
+  let counter = 0;
+
+  request.on("row", function (columns) {
+    response.push({});
+    columns.forEach(function (column) {
+      //console.log(column.value);
+      response[counter][column.metadata.colName] = column.value;
+    });
+    counter += 1;
+  });
+
+  console.log("endd");
+};
+
 exports.getTimeSeriesTotal = (req, res) => {
   req.series = [];
 
@@ -181,21 +215,40 @@ exports.updateJobStatus = (req, res) => {
   );
 
   connection.execSql(request);
-  // let counter = 0;
-
-  // request.on("row", function (columns) {
-  //   response.push({});
-  //   columns.forEach(function (column) {
-  //     //console.log(column.value);
-  //     response[counter][column.metadata.colName] = column.value;
-  //   });
-  //   counter += 1;
-  // });
-
   console.log("endd");
 };
 
-//
+exports.archiveJobs = (req, res) => {
+  console.log(req.body);
+  const date = req.body.date;
+
+  response = "archived";
+  request = new Request(
+    `BEGIN TRANSACTION;
+    INSERT INTO ExampleDB.dbo.ARCHIVES
+    SELECT *
+    FROM [ExampleDB].[dbo].[EMPHASYS2]
+    WHERE ExecutedOn < '${date}';
+    
+    DELETE FROM [ExampleDB].[dbo].[EMPHASYS2]
+    WHERE ExecutedOn < '${date}';
+    
+    COMMIT;`,
+    function (err, rowCount, rows) {
+      if (err) {
+        response.error = err;
+        console.log(err);
+      } else {
+        // Next SQL statement.
+        console.log("sending res");
+        res.json(response);
+      }
+    }
+  );
+
+  connection.execSql(request);
+  console.log("endd");
+};
 
 exports.tryThis = () => {
   console.log("done this");
