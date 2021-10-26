@@ -11,6 +11,7 @@ const {
   updateJobStatus,
   archiveJobs,
   getFilterdArchivedResults,
+  getCompanyListWithCount,
 } = require("../api/sqlserver");
 const router = express.Router();
 
@@ -23,6 +24,8 @@ router.post("/filteredrecords/:offset", getFilterdResults);
 router.post("/filtered_archived_records/:offset", getFilterdArchivedResults);
 
 router.get("/execution_type", getExecutionTypeCount);
+
+router.post("/company_list", getCompanyListWithCount);
 
 router.post("/update_job_status", updateJobStatus);
 

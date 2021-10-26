@@ -304,6 +304,39 @@ exports.getExecutionTypeCount = (req, res) => {
   console.log("endd");
 };
 
+exports.getCompanyListWithCount = (req, res) => {
+  // console.log("company list: ", req.body);
+
+  response = [];
+
+  request = new Request(
+    `SELECT Company, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 WHERE ${req.body.condition} GROUP BY Company ;`,
+    function (err, rowCount, rows) {
+      if (err) {
+        console.log(err);
+      } else {
+        // Next SQL statement.
+        console.log("sending res");
+        res.json(response);
+      }
+    }
+  );
+
+  connection.execSql(request);
+  let counter = 0;
+
+  request.on("row", function (columns) {
+    response.push({});
+    columns.forEach(function (column) {
+      //console.log(column.value);
+      response[counter][column.metadata.colName] = column.value;
+    });
+    counter += 1;
+  });
+
+  console.log("endd");
+};
+
 // const getTimeSeries2 = () => {
 //   response = [];
 
