@@ -45,7 +45,7 @@ connection.on("connect", function (err) {
 
 connection.connect();
 
-console.log("euuuuuuuuuuuu");
+console.log("Starting . .");
 
 exports.executeSQL = (req, res) => {
   let offset = req.offset ? req.offset : 0;
@@ -77,23 +77,23 @@ exports.executeSQL = (req, res) => {
     counter += 1;
   });
 
-  console.log("endd");
+  console.log("get records without filters");
 };
 
 exports.getFilterdResults = (req, res) => {
   let offset = req.offset ? req.offset : 0;
   let filter = req.body;
-  console.log("filter: ", filter);
+  console.log("filter in getFilteredResults: ", filter);
   response = [];
 
   request = new Request(
-    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
       } else {
         // Next SQL statement.
-        console.log("sending res");
+        console.log("sending filtered results");
         res.json(response);
       }
     }
@@ -111,7 +111,7 @@ exports.getFilterdResults = (req, res) => {
     counter += 1;
   });
 
-  console.log("endd");
+  console.log("end sending Filtered Results");
 };
 
 exports.getFilterdArchivedResults = (req, res) => {
@@ -127,7 +127,7 @@ exports.getFilterdArchivedResults = (req, res) => {
         console.log(err);
       } else {
         // Next SQL statement.
-        console.log("sending res");
+        console.log("Send Filtered Archived Results");
         res.json(response);
       }
     }
@@ -145,7 +145,7 @@ exports.getFilterdArchivedResults = (req, res) => {
     counter += 1;
   });
 
-  console.log("endd");
+  console.log("end Filtered Archive results");
 };
 
 exports.getTimeSeriesTotal = (req, res) => {
@@ -190,7 +190,7 @@ exports.getTimeSeries = (req, res) => {
     counter += 1;
   });
 
-  console.log("end");
+  console.log("end time response");
 };
 
 exports.updateJobStatus = (req, res) => {
@@ -208,14 +208,14 @@ exports.updateJobStatus = (req, res) => {
         console.log(err);
       } else {
         // Next SQL statement.
-        console.log("sending res");
+        console.log("update job status success");
         res.json(response);
       }
     }
   );
 
   connection.execSql(request);
-  console.log("endd");
+  console.log("update job status end");
 };
 
 exports.archiveJobs = (req, res) => {
@@ -240,14 +240,14 @@ exports.archiveJobs = (req, res) => {
         console.log(err);
       } else {
         // Next SQL statement.
-        console.log("sending res");
+        console.log("Archiving jobs");
         res.json(response);
       }
     }
   );
 
   connection.execSql(request);
-  console.log("endd");
+  console.log("end Archving jobs");
 };
 
 exports.tryThis = () => {
@@ -272,8 +272,6 @@ exports.getEndTime = (req, res, next, endtime) => {
 };
 
 exports.getExecutionTypeCount = (req, res) => {
-  let offset = req.offset ? req.offset : 0;
-
   response = [];
 
   request = new Request(
@@ -283,7 +281,7 @@ exports.getExecutionTypeCount = (req, res) => {
         console.log(err);
       } else {
         // Next SQL statement.
-        console.log("sending res");
+        console.log("Execution type count");
         res.json(response);
       }
     }
@@ -301,7 +299,7 @@ exports.getExecutionTypeCount = (req, res) => {
     counter += 1;
   });
 
-  console.log("endd");
+  console.log("end Execution type count");
 };
 
 exports.getCompanyListWithCount = (req, res) => {
@@ -310,13 +308,13 @@ exports.getCompanyListWithCount = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT Company, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 WHERE ${req.body.condition} GROUP BY Company ;`,
+    `SELECT Company, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${req.body.condition} GROUP BY Company`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
       } else {
         // Next SQL statement.
-        console.log("sending res");
+        console.log("Company List with count");
         res.json(response);
       }
     }
@@ -334,7 +332,7 @@ exports.getCompanyListWithCount = (req, res) => {
     counter += 1;
   });
 
-  console.log("endd");
+  console.log("end Comapny List with count");
 };
 
 // const getTimeSeries2 = () => {
