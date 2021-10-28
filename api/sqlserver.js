@@ -114,6 +114,40 @@ exports.getFilterdResults = (req, res) => {
   console.log("end sending Filtered Results");
 };
 
+exports.getSolvedResults = (req, res) => {
+  let offset = req.offset ? req.offset : 0;
+  let filter = req.body;
+  console.log("filter in getFilteredResults: ", filter);
+  response = [];
+
+  request = new Request(
+    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus = 'Solved' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    function (err, rowCount, rows) {
+      if (err) {
+        console.log(err);
+      } else {
+        // Next SQL statement.
+        console.log("sending filtered results");
+        res.json(response);
+      }
+    }
+  );
+
+  connection.execSql(request);
+  let counter = 0;
+
+  request.on("row", function (columns) {
+    response.push({});
+    columns.forEach(function (column) {
+      //console.log(column.value);
+      response[counter][column.metadata.colName] = column.value;
+    });
+    counter += 1;
+  });
+
+  console.log("end sending Filtered Results");
+};
+
 exports.getFilterdArchivedResults = (req, res) => {
   let offset = req.offset ? req.offset : 0;
   let filter = req.body;
@@ -303,12 +337,12 @@ exports.getExecutionTypeCount = (req, res) => {
 };
 
 exports.getCompanyListWithCount = (req, res) => {
-  // console.log("company list: ", req.body);
+  console.log("company list here: ", req.body);
 
   response = [];
 
   request = new Request(
-    `SELECT Company, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${req.body.condition} GROUP BY Company`,
+    `SELECT Customer, Company, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${req.body.condition} GROUP BY Customer, Company`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);

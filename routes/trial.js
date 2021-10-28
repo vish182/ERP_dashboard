@@ -12,6 +12,7 @@ const {
   archiveJobs,
   getFilterdArchivedResults,
   getCompanyListWithCount,
+  getSolvedResults,
 } = require("../api/sqlserver");
 const router = express.Router();
 
@@ -20,6 +21,8 @@ router.get("/trial", tryThis);
 router.get("/records/:offset", executeSQL);
 
 router.post("/filteredrecords/:offset", getFilterdResults);
+
+router.post("/solvedrecords/:offset", getSolvedResults);
 
 router.post("/filtered_archived_records/:offset", getFilterdArchivedResults);
 
