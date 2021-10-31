@@ -1,5 +1,5 @@
 const express = require("express");
-const authRoutes = require("./routes/trial");
+const sqlRoutes = require("./routes/routes");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 
@@ -16,7 +16,7 @@ app.use(cors());
 const port = 8000;
 console.log("target");
 
-app.use("/api", authRoutes);
+app.use("/api", sqlRoutes);
 
 app.listen(port, () => {
   console.log(`Server running on ${port}`);
