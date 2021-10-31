@@ -13,7 +13,9 @@ const {
   getFilterdArchivedResults,
   getCompanyListWithCount,
   getSolvedResults,
+  getHistoryCompanyListWithCount,
 } = require("../api/sqlserver");
+const { sendMail } = require("../api/mail");
 const router = express.Router();
 
 router.get("/trial", tryThis);
@@ -30,11 +32,15 @@ router.get("/execution_type", getExecutionTypeCount);
 
 router.post("/company_list", getCompanyListWithCount);
 
+router.post("/history_company_list", getHistoryCompanyListWithCount);
+
 router.post("/update_job_status", updateJobStatus);
 
 router.post("/archive_jobs", archiveJobs);
 
 router.get("/timeseries/:starttime/:endtime", getTimeSeries);
+
+router.post("/activation_mail", sendMail);
 
 router.param("offset", getOffset);
 router.param("starttime", getStartTime);
