@@ -39,18 +39,28 @@
 //   extra: { trustServerCertificate: true },
 // };
 
-var config = {
-  server: "localhost\\SQLEXPRESS",
+// export var config = {
+//   server: "localhost\\SQLEXPRESS",
 
-  database: "ExampleDB",
+//   database: "ExampleDB",
 
-  user: "vish", // Update it
+//   user: "vish", // Update it
 
-  password: "vish", // Update it
+//   password: "vish", // Update it
 
-  port: 1433,
+//   port: 1433,
 
-  extra: { trustServerCertificate: true },
+//   extra: { trustServerCertificate: true },
+// };
+
+var database = {
+  withBraces: "[ExampleDB]",
+  withoutBraces: "ExampleDB",
 };
 
-module.exports = config;
+var tables = {
+  mainRecords: `${database.withBraces}.dbo.EMPHASYS2`,
+  archiveRecords: `${database.withBraces}.dbo.ARCHIVES`,
+};
+
+module.exports = { tables, database };

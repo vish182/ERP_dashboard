@@ -1,5 +1,6 @@
 // const config = require("../dbconfig");
 // const sql = require("mssql");
+const { tables, database } = require("../dbconfig");
 const Request = require("tedious").Request;
 
 // const getAllrecords = async () => {
@@ -28,7 +29,7 @@ var config = {
   options: {
     // If you are on Microsoft Azure, you need encryption:
     encrypt: true,
-    database: "ExampleDB", //update me
+    database: database.withoutBraces, //update me
   },
 };
 var connection = new Connection(config);
@@ -53,7 +54,7 @@ exports.executeSQL = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    `SELECT * FROM ${tables.mainRecords} WHERE ExecutionType != 'Executed' ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -87,7 +88,7 @@ exports.getFilterdResults = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    `SELECT * FROM ${tables.mainRecords} WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -121,7 +122,7 @@ exports.getSolvedResults = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT * FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus = 'Solved' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    `SELECT * FROM ${tables.mainRecords} WHERE ExecutionType != 'Executed' AND EnggStatus = 'Solved' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -155,7 +156,7 @@ exports.getFilterdArchivedResults = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT * FROM [ExampleDB].dbo.ARCHIVES WHERE ExecutionType != 'Executed' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
+    `SELECT * FROM ${tables.archiveRecords} WHERE ExecutionType != 'Executed' ${filter.conditions} ORDER BY ExecutedOn DESC OFFSET ${offset} ROWS FETCH NEXT 25 ROWS ONLY;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -200,7 +201,7 @@ exports.getTimeSeries = (req, res) => {
   response = 0;
 
   request = new Request(
-    `SELECT COUNT(ExecutedOn) FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutedOn > '${starttime}' AND ExecutedOn < '${endtime}' AND ExecutionType = 'NotExecuted';`,
+    `SELECT COUNT(ExecutedOn) FROM ${tables.mainRecords} WHERE ExecutedOn > '${starttime}' AND ExecutedOn < '${endtime}' AND ExecutionType = 'NotExecuted';`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -235,7 +236,7 @@ exports.updateJobStatus = (req, res) => {
 
   response = "updated";
   request = new Request(
-    `UPDATE [ExampleDB].[dbo].[EMPHASYS2] SET EnggStatus = '${jobStatus}', EnggMessage= '${updateMessage}' WHERE JobKey = ${jobKey};`,
+    `UPDATE ${tables.mainRecords} SET EnggStatus = '${jobStatus}', EnggMessage= '${updateMessage}' WHERE JobKey = ${jobKey};`,
     function (err, rowCount, rows) {
       if (err) {
         response.error = err;
@@ -259,12 +260,12 @@ exports.archiveJobs = (req, res) => {
   response = "archived";
   request = new Request(
     `BEGIN TRANSACTION;
-    INSERT INTO ExampleDB.dbo.ARCHIVES
+    INSERT INTO ${tables.archiveRecords}
     SELECT *
-    FROM [ExampleDB].[dbo].[EMPHASYS2]
+    FROM ${tables.mainRecords}
     WHERE ExecutedOn < '${date}';
     
-    DELETE FROM [ExampleDB].[dbo].[EMPHASYS2]
+    DELETE FROM ${tables.mainRecords}
     WHERE ExecutedOn < '${date}';
     
     COMMIT;`,
@@ -309,7 +310,7 @@ exports.getExecutionTypeCount = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT ExecutionType, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 GROUP BY ExecutionType;`,
+    `SELECT ExecutionType, COUNT(*) totalCount FROM ${tables.mainRecords} GROUP BY ExecutionType;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
@@ -342,7 +343,7 @@ exports.getCompanyListWithCount = (req, res) => {
   response = [];
 
   request = new Request(
-    `SELECT Customer, Company, COUNT(*) totalCount FROM [ExampleDB].dbo.EMPHASYS2 WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${req.body.condition} GROUP BY Customer, Company`,
+    `SELECT Customer, Company, COUNT(*) totalCount FROM ${tables.mainRecords} WHERE ExecutionType != 'Executed' AND EnggStatus != 'Solved' ${req.body.condition} GROUP BY Customer, Company`,
     function (err, rowCount, rows) {
       if (err) {
         console.log(err);
