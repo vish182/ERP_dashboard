@@ -285,6 +285,30 @@ exports.archiveJobs = (req, res) => {
   //console.log("end Archving jobs");
 };
 
+exports.purgeJobs = (req, res) => {
+  console.log(req.body);
+  const date = req.body.date;
+
+  response = "purged";
+  request = new Request(
+    `DELETE FROM ${tables.archiveRecords}
+    WHERE ExecutedOn < '${date}';`,
+    function (err, rowCount, rows) {
+      if (err) {
+        response.error = err;
+        console.log("[ERROR] archiveJobs: ", err);
+      } else {
+        // Next SQL statement.
+        //console.log("Archiving jobs");
+        res.json(response);
+      }
+    }
+  );
+
+  connection.execSql(request);
+  //console.log("end Archving jobs");
+};
+
 exports.tryThis = () => {
   console.log("done this");
   // let response = getTimeSeries2();
@@ -309,8 +333,20 @@ exports.getEndTime = (req, res, next, endtime) => {
 exports.getExecutionTypeCount = (req, res) => {
   response = [];
 
+  let date = new Date();
+  var dateString;
+
+  dateString =
+    date.getFullYear() +
+    "-" +
+    ("0" + (date.getMonth() + 1)).slice(-2) +
+    "-" +
+    ("0" + date.getDate()).slice(-2);
+
+  //console.log(dateString);
+
   request = new Request(
-    `SELECT ExecutionType, COUNT(*) totalCount FROM ${tables.mainRecords} GROUP BY ExecutionType;`,
+    `SELECT ExecutionType, COUNT(*) totalCount FROM ${tables.mainRecords} WHERE ExecutedOn > '${dateString}' AND ExecutionType != 'Executed' GROUP BY ExecutionType;`,
     function (err, rowCount, rows) {
       if (err) {
         console.log("[ERROR] getExecutionTypeCount: ", err);

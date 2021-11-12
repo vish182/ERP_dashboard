@@ -14,11 +14,12 @@ const {
   getCompanyListWithCount,
   getSolvedResults,
   getHistoryCompanyListWithCount,
+  purgeJobs,
 } = require("../api/sqlserver");
 const { sendMail } = require("../api/mail");
 const router = express.Router();
 
-router.get("/trial", tryThis);
+router.get("/", tryThis);
 
 router.get("/records/:offset", executeSQL);
 
@@ -37,6 +38,8 @@ router.post("/history_company_list", getHistoryCompanyListWithCount);
 router.post("/update_job_status", updateJobStatus);
 
 router.post("/archive_jobs", archiveJobs);
+
+router.post("/purge_jobs", purgeJobs);
 
 router.get("/timeseries/:starttime/:endtime", getTimeSeries);
 
