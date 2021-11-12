@@ -41,7 +41,7 @@ router.post("/archive_jobs", archiveJobs);
 
 router.post("/purge_jobs", purgeJobs);
 
-router.get("/timeseries/:starttime/:endtime", getTimeSeries);
+// router.get("/timeseries/:starttime/:endtime", getTimeSeries);
 
 router.post("/activation_mail", sendMail);
 
