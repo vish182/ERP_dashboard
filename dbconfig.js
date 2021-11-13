@@ -1,3 +1,15 @@
+var database = {
+  withBraces: "[ExampleDB]", // database name
+  withoutBraces: "ExampleDB", // database name without brackets
+};
+
+var tables = {
+  mainRecords: `${database.withBraces}.dbo.EMPHASYS2`, // main jobs table, replace EMPHASYS2 with your table name
+  archiveRecords: `${database.withBraces}.dbo.ARCHIVES`, // archive table, replace ARCHIVES with your archive table name
+};
+
+module.exports = { tables, database };
+
 // const config = {
 //   user: "vish",
 //   password: "vish",
@@ -52,15 +64,3 @@
 
 //   extra: { trustServerCertificate: true },
 // };
-
-var database = {
-  withBraces: "[ExampleDB]",
-  withoutBraces: "ExampleDB",
-};
-
-var tables = {
-  mainRecords: `${database.withBraces}.dbo.EMPHASYS2`,
-  archiveRecords: `${database.withBraces}.dbo.ARCHIVES`,
-};
-
-module.exports = { tables, database };
