@@ -6,14 +6,15 @@ const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
     user: fromEmail,
-    pass: "emphasysadmin",
+    pass: "emphasysadmin", //password
   },
 });
 
-const mailExec = ({ toEmail, subject, text }) => {
+const mailExec = ({ toEmail, subject, text, cc }) => {
   let mailOptions = {
     from: fromEmail,
     to: toEmail,
+    cc: cc,
     subject: subject,
     text: text,
   };
@@ -34,5 +35,6 @@ exports.sendMail = (req, res) => {
     toEmail: req.body.toEmail,
     subject: req.body.subject,
     text: req.body.text,
+    cc: req.body.cc,
   });
 };
